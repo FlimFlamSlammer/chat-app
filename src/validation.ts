@@ -1,8 +1,7 @@
 import { Handler } from "express";
 import { z } from "zod";
-import { createErrorWithMessage, createFieldError } from "./error";
 import { StatusCodes } from "http-status-codes";
-import { validStatuses } from "./types";
+import { ErrorWithMessage, FieldError } from "./error";
 
 type ValidationSchemas = {
     bodySchema?: z.Schema;
@@ -18,7 +17,6 @@ export const withValidation = (
 
     return (req, res, next) => {
         try {
-            // validation happens
             if (bodySchema !== undefined) {
                 req.body = bodySchema.parse(req.body);
             }
@@ -34,36 +32,21 @@ export const withValidation = (
             handler(req, res, next);
         } catch (error) {
             if (error instanceof z.ZodError) {
-                const fields = error.errors.reduce(
-                    (acc, { path, message }) => ({
-                        ...acc,
+                const fields = error.issues.reduce(
+                    (errorMessages, { path, message }) => ({
+                        ...errorMessages,
                         [path.join(".")]: message,
                     }),
                     {}
                 );
 
-                throw createFieldError(fields);
+                throw new FieldError(fields);
             }
 
-            throw createErrorWithMessage(
+            throw new ErrorWithMessage(
                 StatusCodes.INTERNAL_SERVER_ERROR,
                 (error as Error).message
             );
         }
     };
 };
-
-export const idParamsSchema = z.object({
-    id: z.string(),
-});
-
-export const listQuerySchema = z.object({
-    page: z.coerce.number().int().min(1).default(1),
-    size: z.coerce.number().int().min(1).default(10),
-    mode: z.enum(["all", "pagination"]).optional().default("pagination"),
-    search: z.string().optional(),
-    status: z
-        .enum([...validStatuses, "all"] as const)
-        .optional()
-        .default("all"),
-});

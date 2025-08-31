@@ -7,7 +7,7 @@ async function startServer() {
     const app = express();
     const PORT = ENV.PORT;
 
-    mongoose.connect(ENV.MONGO_URI).then(() => console.log("Connected!"));
+    mongoose.connect(ENV.MONGO_URI).then(() => console.log("Connected to DB"));
 
     app.use(errorMiddleware);
 

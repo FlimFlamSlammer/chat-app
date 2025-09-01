@@ -1,12 +1,9 @@
-import "express";
+import { AuthAccount } from "~/auth/auth-service";
 
-declare module "express-serve-static-core" {
-    interface Request {
-        account: {
-            id: string;
-            name: string;
-            username: string;
-            email: string;
-        };
+declare global {
+    namespace Express {
+        interface Request {
+            account: AuthAccount;
+        }
     }
 }

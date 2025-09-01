@@ -34,14 +34,7 @@ export const withValidation = (
             handler(req, res, next);
         } catch (error) {
             if (error instanceof z.ZodError) {
-                const fields = error.issues.reduce(
-                    (errorMessages, { path, message }) => ({
-                        ...errorMessages,
-                        [path.join(".")]: message,
-                    }),
-                    {}
-                );
-
+                const fields = flattenZodError(error);
                 throw new FieldError(fields);
             }
 
@@ -51,4 +44,14 @@ export const withValidation = (
             );
         }
     };
+};
+
+const flattenZodError = (error: z.ZodError) => {
+    return error.issues.reduce(
+        (errorMessages, { path, message }) => ({
+            ...errorMessages,
+            [path.join(".")]: message,
+        }),
+        {}
+    );
 };

@@ -1,6 +1,8 @@
 import { Account } from "~/models/account";
 import argon2 from "argon2";
 import { FieldError } from "~/error";
+import jwt from "jsonwebtoken";
+import { ENV } from "~/env";
 
 export interface CreateAccountDTO {
     name: string;
@@ -14,6 +16,17 @@ export interface LogInDTO {
     password: string;
 }
 
+export interface AuthAccount {
+    id: string;
+    name: string;
+    username: string;
+    email: string;
+}
+
+interface AuthTokenPayload {
+    id: string;
+}
+
 class AuthService {
     async register(data: CreateAccountDTO) {
         const passwordHash = await argon2.hash(data.password);
@@ -24,15 +37,28 @@ class AuthService {
         const account = await Account.findOne({ email: data.email });
         const invalidCredentials = () =>
             new FieldError({
-                email: "Invalid credentials.",
-                password: "Invalid credentials.",
+                email: "Invalid credentials",
+                password: "Invalid credentials",
             });
         if (!account) throw invalidCredentials();
 
         const isValid = await argon2.verify(account.password, data.password);
         if (!isValid) throw invalidCredentials();
 
-        return account;
+        const authToken = this.signAuthToken({ id: account.id });
+
+        return authToken;
+    }
+
+    async verifyAuthToken(authToken: string) {
+        const id = jwt.verify(authToken, ENV.JWT_SECRET);
+        return (await Account.findById(id)) as AuthAccount;
+    }
+
+    private signAuthToken(payload: AuthTokenPayload) {
+        return jwt.sign(payload, ENV.JWT_SECRET, {
+            expiresIn: "1 week",
+        });
     }
 }
 

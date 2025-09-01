@@ -22,11 +22,13 @@ export const withValidation = (
             }
 
             if (querySchema !== undefined) {
-                req.query = querySchema.parse(req.query);
+                req.query = querySchema.parse(req.query) as typeof req.query;
             }
 
             if (paramsSchema !== undefined) {
-                req.params = paramsSchema.parse(req.params);
+                req.params = paramsSchema.parse(
+                    req.params
+                ) as typeof req.params;
             }
 
             handler(req, res, next);

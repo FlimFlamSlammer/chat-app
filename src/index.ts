@@ -2,12 +2,17 @@ import express from "express";
 import { ENV } from "./env";
 import { errorMiddleware } from "./error";
 import mongoose from "mongoose";
+import { createAuthRouter } from "./auth/auth-router";
 
 async function startServer() {
     const app = express();
     const PORT = ENV.PORT;
 
     mongoose.connect(ENV.MONGO_URI).then(() => console.log("Connected to DB"));
+
+    app.use(express.json());
+
+    app.use("/auth", createAuthRouter());
 
     app.use(errorMiddleware);
 

@@ -4,11 +4,13 @@ import { authController } from "./auth-controller";
 export const createAuthRouter = () => {
     const authRouter = express.Router();
 
-    authRouter.use(authController.middleware);
-
     authRouter.post("/login", authController.logIn);
     authRouter.post("/register", authController.register);
-    authRouter.post("/me", authController.getLoggedInAccount);
+    authRouter.post(
+        "/me",
+        authController.middleware,
+        authController.getLoggedInAccount
+    );
 
     return authRouter;
 };

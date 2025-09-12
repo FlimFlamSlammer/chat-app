@@ -50,7 +50,10 @@ class AuthService {
         return authToken;
     }
 
-    async verifyAuthToken(authToken: string) {
+    async verifyAuthToken(rawAuthToken: string) {
+        // split bearer and token
+        const [_, authToken] = rawAuthToken.split(" ");
+
         const id = jwt.verify(authToken, ENV.JWT_SECRET);
         return (await Account.findById(id)) as AuthAccount;
     }

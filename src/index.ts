@@ -6,6 +6,7 @@ import { createAuthRouter } from "./auth/auth-router";
 import { Server } from "socket.io";
 import { registerSocket } from "./socket/register-socket";
 import { createServer } from "http";
+import { createFriendRequestRouter } from "./friend-request/friend-request-router";
 
 async function startServer() {
     const app = express();
@@ -15,6 +16,7 @@ async function startServer() {
     app.use(express.json());
 
     app.use("/auth", createAuthRouter());
+    app.use("/friend-request", createFriendRequestRouter());
 
     app.use(errorMiddleware);
 

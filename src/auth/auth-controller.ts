@@ -73,7 +73,7 @@ class AuthController {
             const account = await authService.verifyAuthToken(authToken);
             req.account = account;
             next();
-        } catch {
+        } catch (error) {
             return unauthorizedResponse();
         }
     });

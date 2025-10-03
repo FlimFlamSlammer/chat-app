@@ -6,7 +6,7 @@ export const createAuthRouter = () => {
 
     authRouter.post("/login", authController.logIn);
     authRouter.post("/register", authController.register);
-    authRouter.post(
+    authRouter.get(
         "/me",
         authController.middleware,
         authController.getLoggedInAccount

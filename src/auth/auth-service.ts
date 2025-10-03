@@ -54,7 +54,7 @@ class AuthService {
         // split bearer and token
         const [_, authToken] = rawAuthToken.split(" ");
 
-        const id = jwt.verify(authToken, ENV.JWT_SECRET);
+        const { id } = jwt.verify(authToken, ENV.JWT_SECRET) as { id: string };
         return (await Account.findById(id)) as AuthAccount;
     }
 

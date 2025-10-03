@@ -8,6 +8,7 @@ export const createFriendRequestRouter = () => {
     friendRequestRouter.use(authController.middleware);
     friendRequestRouter.post("/send/:to", friendRequestController.send);
     friendRequestRouter.post("/accept/:id", friendRequestController.accept);
+    friendRequestRouter.post("/reject/:id", friendRequestController.reject);
     friendRequestRouter.get("/incoming", friendRequestController.getIncoming);
     friendRequestRouter.get("/outgoing", friendRequestController.getOutgoing);
 

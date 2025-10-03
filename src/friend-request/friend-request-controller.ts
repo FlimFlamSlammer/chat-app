@@ -47,6 +47,21 @@ class FriendRequestController {
         })
     );
 
+    reject = withValidation(
+        {
+            paramsSchema: acceptFriendRequestSchema,
+        },
+        asyncMiddleware(async (req, res) => {
+            const id = req.params.id as string;
+
+            await friendRequestService.reject(id, req.account.id);
+
+            res.status(StatusCodes.OK).json({
+                message: "Friend request rejected successfully",
+            });
+        })
+    );
+
     getIncoming = asyncMiddleware(async (req, res) => {
         const friendRequests = await FriendRequest.find({
             to: req.account.id,

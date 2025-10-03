@@ -45,4 +45,25 @@ export const registerFriendRequestHandlers = (io: Server, socket: Socket) => {
             socket.emit("error", "Failed to accept friend request");
         }
     });
+
+    socket.on("friend-request:reject", async (requestId: string) => {
+        try {
+            const request = await FriendRequest.findById(requestId);
+            if (!request) {
+                throw new ErrorWithMessage(
+                    StatusCodes.NOT_FOUND,
+                    "Friend request not found"
+                );
+            }
+
+            io.to(`personal:${request.from}`).emit(
+                "friend-request:rejected",
+                request
+            );
+
+            socket.emit("friend-request:rejected:ack", request);
+        } catch (error) {
+            socket.emit("error", "Failed to reject friend request");
+        }
+    });
 };

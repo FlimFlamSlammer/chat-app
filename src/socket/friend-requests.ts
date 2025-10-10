@@ -7,7 +7,7 @@ export const registerFriendRequestHandlers = (io: Server, socket: Socket) => {
     socket.on("friend-request:send", async (requestId: string) => {
         try {
             const request = await FriendRequest.findById(requestId);
-            if (!request) {
+            if (!request || request.from !== socket.data.accountId) {
                 throw new ErrorWithMessage(
                     StatusCodes.NOT_FOUND,
                     "Friend request not found"
@@ -28,14 +28,14 @@ export const registerFriendRequestHandlers = (io: Server, socket: Socket) => {
     socket.on("friend-request:accept", async (requestId: string) => {
         try {
             const request = await FriendRequest.findById(requestId);
-            if (!request) {
+            if (!request || request.to !== socket.data.accountId) {
                 throw new ErrorWithMessage(
                     StatusCodes.NOT_FOUND,
                     "Friend request not found"
                 );
             }
 
-            io.to(`personal:${request.to}`).emit(
+            io.to(`personal:${request.from}`).emit(
                 "friend-request:accepted",
                 request
             );

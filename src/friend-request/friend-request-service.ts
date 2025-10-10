@@ -12,7 +12,11 @@ export interface SendFriendRequestDTO {
 class FriendRequestService {
     async send(data: SendFriendRequestDTO) {
         const sender = await Account.findById(data.from);
-        if (sender && data.to in sender.friends) {
+        const alreadyFriends = sender?.friends.reduce(
+            (acc, friendId) => (acc ||= friendId.toString() == data.to),
+            false
+        );
+        if (alreadyFriends) {
             throw new ErrorWithMessage(
                 StatusCodes.BAD_REQUEST,
                 "Already friends with receiver"

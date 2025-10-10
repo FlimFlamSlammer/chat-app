@@ -6,7 +6,6 @@ export const registerSocket = (io: Server) => {
     io.on("connection", async (socket: Socket) => {
         try {
             const rawToken = socket.handshake.headers.authorization as string;
-            const [_, token] = rawToken.split(" ");
 
             const account = await authService.verifyAuthToken(token);
             socket.data.accountId = account.id;

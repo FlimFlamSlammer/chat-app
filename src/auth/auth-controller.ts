@@ -8,14 +8,14 @@ import { StatusCodes } from "http-status-codes";
 import { ENV } from "~/env";
 
 const registerSchema = z.object({
-    name: z.string(),
-    username: z.string(),
-    email: z.string(),
+    name: z.string().trim(),
+    username: z.string().trim(),
+    email: z.string().trim(),
     password: z.string(),
 });
 
 const logInSchema = z.object({
-    email: z.string(),
+    email: z.string().trim(),
     password: z.string(),
 });
 

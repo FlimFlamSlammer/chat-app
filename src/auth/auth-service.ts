@@ -29,6 +29,26 @@ interface AuthTokenPayload {
 
 class AuthService {
     async register(data: CreateAccountDTO) {
+        const existingEmail = await Account.findOne({
+            email: data.email,
+        });
+
+        if (existingEmail) {
+            throw new FieldError({
+                email: "Email already in use",
+            });
+        }
+
+        const existingUsername = await Account.findOne({
+            username: data.username,
+        });
+
+        if (existingUsername) {
+            throw new FieldError({
+                username: "Username already in use",
+            });
+        }
+
         const passwordHash = await argon2.hash(data.password);
         return await Account.create({ ...data, password: passwordHash });
     }

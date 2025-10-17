@@ -13,8 +13,8 @@ export interface IConversation extends Document {
 
 const conversationSchema = new Schema<IConversation>(
     {
-        name: { type: String, required: true },
-        type: { type: String, required: true },
+        name: { type: String },
+        type: { type: String, required: true }, // personal | group
         participants: [
             {
                 type: Schema.Types.ObjectId,
@@ -34,7 +34,6 @@ const conversationSchema = new Schema<IConversation>(
         createdBy: {
             type: Schema.Types.ObjectId,
             ref: "Account",
-            required: true,
         },
         dmKey: { type: String, index: { unique: true, sparse: true } },
     },

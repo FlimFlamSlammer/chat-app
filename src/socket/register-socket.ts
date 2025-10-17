@@ -5,7 +5,7 @@ import { registerFriendRequestHandlers } from "./friend-requests";
 export const registerSocket = (io: Server) => {
     io.on("connection", async (socket: Socket) => {
         try {
-            const rawToken = socket.handshake.headers.authorization as string;
+            const token = socket.handshake.headers.authorization as string;
 
             const account = await authService.verifyAuthToken(token);
             socket.data.accountId = account.id;

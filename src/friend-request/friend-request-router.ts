@@ -6,7 +6,7 @@ export const createFriendRequestRouter = () => {
     const friendRequestRouter = express.Router();
 
     friendRequestRouter.use(authController.middleware);
-    friendRequestRouter.post("/send/:to", friendRequestController.send);
+    friendRequestRouter.post("/send", friendRequestController.send);
     friendRequestRouter.post("/accept/:id", friendRequestController.accept);
     friendRequestRouter.post("/reject/:id", friendRequestController.reject);
     friendRequestRouter.get("/incoming", friendRequestController.getIncoming);

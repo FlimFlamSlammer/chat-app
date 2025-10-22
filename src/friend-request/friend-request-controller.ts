@@ -4,26 +4,28 @@ import { withValidation } from "~/validation";
 import { friendRequestService } from "./friend-request-service";
 import { StatusCodes } from "http-status-codes";
 import { FriendRequest } from "~/models/friend-request";
-import { ErrorWithMessage } from "~/error";
+import { accountService } from "~/account/account-service";
 
-const sendFriendRequestSchema = z.object({
-    to: z.string(),
+const sendFriendRequestBodySchema = z.object({
+    username: z.string().trim(),
 });
 
-const acceptFriendRequestSchema = z.object({
+const acceptFriendRequestParamsSchema = z.object({
     id: z.string(),
 });
 
 class FriendRequestController {
     send = withValidation(
         {
-            paramsSchema: sendFriendRequestSchema,
+            bodySchema: sendFriendRequestBodySchema,
         },
         asyncMiddleware(async (req, res) => {
-            const { to } = req.params as { to: string };
+            const { username } = req.body;
+            const account = await accountService.findByUsername(username);
+
             await friendRequestService.send({
                 from: req.account.id,
-                to,
+                to: account?.id,
             });
 
             res.status(StatusCodes.OK).json({
@@ -34,7 +36,7 @@ class FriendRequestController {
 
     accept = withValidation(
         {
-            paramsSchema: acceptFriendRequestSchema,
+            paramsSchema: acceptFriendRequestParamsSchema,
         },
         asyncMiddleware(async (req, res) => {
             const id = req.params.id as string;
@@ -49,7 +51,7 @@ class FriendRequestController {
 
     reject = withValidation(
         {
-            paramsSchema: acceptFriendRequestSchema,
+            paramsSchema: acceptFriendRequestParamsSchema,
         },
         asyncMiddleware(async (req, res) => {
             const id = req.params.id as string;

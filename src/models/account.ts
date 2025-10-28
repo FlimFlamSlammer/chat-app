@@ -4,6 +4,7 @@ export interface IAccount extends Document {
     name: string;
     username: string;
     friends: Types.ObjectId[];
+    conversations: Types.ObjectId[];
     email: string;
     password: string;
     createdAt: Date;
@@ -37,6 +38,9 @@ const accountSchema = new Schema<IAccount>(
         },
         friends: [
             { type: Schema.Types.ObjectId, required: true, ref: "Account" },
+        ],
+        conversations: [
+            { type: Schema.Types.ObjectId, required: true, ref: "Conversation" },
         ],
     },
     { timestamps: true }

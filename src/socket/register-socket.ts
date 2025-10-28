@@ -1,6 +1,6 @@
 import { Server, Socket } from "socket.io";
 import { authService } from "~/auth/auth-service";
-import { registerFriendRequestHandlers } from "./friend-requests";
+import { registerFriendRequestHandlers } from "./friend-request";
 
 export const registerSocket = (io: Server) => {
     io.on("connection", async (socket: Socket) => {

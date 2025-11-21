@@ -8,9 +8,21 @@ const createPersonalConversationBodySchema = z.object({
     targetUserId: z.string(),
 });
 
+const createGroupBodySchema = z.object({
+    name: z.string().trim(),
+});
+
+const inviteToGroupBodySchema = z.object({
+    inviteeIds: z.array(z.string()),
+});
+const inviteToGroupParamsSchema = z.object({
+    groupId: z.string(),
+});
+
+
 const sendMessageParamsSchema = z.object({
-	conversationId: z.string(),
-})
+    conversationId: z.string(),
+});
 
 const sendMessageBodySchema = z.object({
     text: z.string().min(1),
@@ -23,11 +35,11 @@ const getMessagesParamsSchema = z.object({
 class ChatController {
     sendMessage = withValidation(
         {
-			paramsSchema: sendMessageParamsSchema,
+            paramsSchema: sendMessageParamsSchema,
             bodySchema: sendMessageBodySchema,
         },
         asyncMiddleware(async (req, res) => {
-			const { conversationId } = req.params as { conversationId: string };
+            const { conversationId } = req.params as { conversationId: string };
             const { text } = req.body;
             await chatService.sendMessage(conversationId, req.account.id, text);
 
@@ -54,13 +66,46 @@ class ChatController {
         })
     );
 
+    createGroup = withValidation(
+        {
+            bodySchema: createPersonalConversationBodySchema,
+        },
+        asyncMiddleware(async (req, res) => {
+            const { name } = req.body;
+            await chatService.createGroup(req.account.id, name);
+
+            res.status(StatusCodes.OK).json({
+                message: "Group created successfully",
+            });
+        })
+    );
+
+    inviteToGroup = withValidation(
+        {
+            paramsSchema: inviteToGroupParamsSchema,
+            bodySchema: inviteToGroupBodySchema,
+        },
+        asyncMiddleware(async (req, res) => {
+            const { inviteeIds } = req.body;
+            const { groupId } = req.params as { groupId: string };
+            await chatService.inviteToGroup(req.body.account.id, groupId, inviteeIds);
+
+            res.status(StatusCodes.OK).json({
+                message: "User invited successfully"
+            });
+        })
+    )
+
     getMessages = withValidation(
         {
             paramsSchema: getMessagesParamsSchema,
         },
         asyncMiddleware((req, res) => {
             const { conversationId } = req.params as { conversationId: string };
-            const messages = chatService.getMessages(req.account.id, conversationId);
+            const messages = chatService.getMessages(
+                req.account.id,
+                conversationId
+            );
 
             res.status(StatusCodes.OK).json({
                 data: {
@@ -71,7 +116,9 @@ class ChatController {
     );
 
     getConversations = asyncMiddleware(async (req, res) => {
-        const conversations = await chatService.getConversations(req.account.id);
+        const conversations = await chatService.getConversations(
+            req.account.id
+        );
         res.status(StatusCodes.OK).json({
             data: {
                 conversations,

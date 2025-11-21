@@ -14,7 +14,7 @@ export const registerChatHandlers = (io: Server, socket: Socket) => {
 				);
 			}
 
-			io.to(`personal:${message.conversation}`).emit(
+			io.to(`conversation:${message.conversation}`).emit(
 				"message:received",
 				message
 			);

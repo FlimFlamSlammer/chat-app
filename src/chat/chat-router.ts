@@ -7,6 +7,8 @@ export const createChatRouter = () => {
 
 	chatRouter.use(authController.middleware);
 	chatRouter.post("/create-personal", chatController.createPersonalConversation);
+	chatRouter.post("/create-group", chatController.createGroup);
+	chatRouter.put("/:groupId/invite", chatController.inviteToGroup);
 	chatRouter.post(
         "/:conversationId/send-message",
         chatController.sendMessage

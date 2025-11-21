@@ -68,7 +68,7 @@ class ChatController {
 
     createGroup = withValidation(
         {
-            bodySchema: createPersonalConversationBodySchema,
+            bodySchema: createGroupBodySchema,
         },
         asyncMiddleware(async (req, res) => {
             const { name } = req.body;

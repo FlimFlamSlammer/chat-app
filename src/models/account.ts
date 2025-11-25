@@ -37,10 +37,18 @@ const accountSchema = new Schema<IAccount>(
             required: true,
         },
         friends: [
-            { type: Schema.Types.ObjectId, required: true, ref: "Account" },
+            {
+                type: Schema.Types.ObjectId,
+                required: true,
+                ref: "Account",
+            },
         ],
         conversations: [
-            { type: Schema.Types.ObjectId, required: true, ref: "Conversation" },
+            {
+                type: Schema.Types.ObjectId,
+                required: true,
+                ref: "Conversation",
+            },
         ],
     },
     { timestamps: true }

@@ -45,10 +45,10 @@ class FriendRequestService {
         }
 
         await Account.findByIdAndUpdate(request.from, {
-            $push: { friends: request.to },
+            $addToSet: { friends: request.to },
         });
         await Account.findByIdAndUpdate(request.to, {
-            $push: { friends: request.from },
+            $addToSet: { friends: request.from },
         });
 
         await FriendRequest.deleteOne({ _id: id });

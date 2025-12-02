@@ -19,7 +19,6 @@ const inviteToGroupParamsSchema = z.object({
     groupId: z.string(),
 });
 
-
 const sendMessageParamsSchema = z.object({
     conversationId: z.string(),
 });
@@ -30,6 +29,10 @@ const sendMessageBodySchema = z.object({
 
 const getMessagesParamsSchema = z.object({
     conversationId: z.string(),
+});
+
+const getConversationParamsSchema = z.object({
+    id: z.string(),
 });
 
 class ChatController {
@@ -88,13 +91,17 @@ class ChatController {
         asyncMiddleware(async (req, res) => {
             const { inviteeIds } = req.body;
             const { groupId } = req.params as { groupId: string };
-            await chatService.inviteToGroup(req.body.account.id, groupId, inviteeIds);
+            await chatService.inviteToGroup(
+                req.body.account.id,
+                groupId,
+                inviteeIds
+            );
 
             res.status(StatusCodes.OK).json({
-                message: "User invited successfully"
+                message: "User invited successfully",
             });
         })
-    )
+    );
 
     getMessages = withValidation(
         {
@@ -120,11 +127,23 @@ class ChatController {
             req.account.id
         );
         res.status(StatusCodes.OK).json({
-            data: {
-                conversations,
-            },
+            data: conversations,
         });
     });
+
+    getById = withValidation(
+        {
+            paramsSchema: getConversationParamsSchema,
+        },
+        asyncMiddleware(async (req, res, next) => {
+            const { id } = req.params as { id: string };
+            const conversation = await chatService.getById(id);
+
+            res.status(StatusCodes.OK).json({
+                data: conversation,
+            });
+        })
+    );
 }
 
 export const chatController = new ChatController();

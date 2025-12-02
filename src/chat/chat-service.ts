@@ -163,6 +163,20 @@ class ChatService {
             createdAt: -1,
         });
     }
+
+    async getById(id: string) {
+        const conversation = await Conversation.findById(id)
+            .populate({
+                path: "participants",
+                select: "username",
+            })
+            .populate({
+                path: "admins",
+                select: "username",
+            })
+            .exec();
+        return conversation;
+    }
 }
 
 export const chatService = new ChatService();

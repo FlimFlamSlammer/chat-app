@@ -39,10 +39,10 @@ class ChatService {
         });
 
         await Account.findByIdAndUpdate(creatorId, {
-            $push: { conversations: conversation._id },
+            $addToSet: { conversations: conversation._id },
         });
         await Account.findByIdAndUpdate(targetId, {
-            $push: { conversations: conversation._id },
+            $addToSet: { conversations: conversation._id },
         });
 
         return conversation;
@@ -112,8 +112,16 @@ class ChatService {
             );
         }
 
-        Conversation.findByIdAndUpdate(groupId, {
+        await Conversation.findByIdAndUpdate(groupId, {
             $addToSet: { participants: { $each: inviteeIds } },
+        });
+
+        inviteeIds.forEach(async (id) => {
+            await Account.findByIdAndUpdate(id, {
+                $addToSet: {
+                    conversations: groupId,
+                },
+            });
         });
     }
 
@@ -177,6 +185,8 @@ class ChatService {
             .exec();
         return conversation;
     }
+
+    async exit(id: string, userId: string) {}
 }
 
 export const chatService = new ChatService();

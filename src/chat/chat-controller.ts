@@ -3,6 +3,7 @@ import { asyncMiddleware } from "~/async-middleware";
 import { withValidation } from "~/validation";
 import { chatService } from "./chat-service";
 import { StatusCodes } from "http-status-codes";
+import { ErrorWithMessage } from "~/error";
 
 const createPersonalConversationBodySchema = z.object({
     targetUserId: z.string(),
@@ -33,6 +34,18 @@ const getMessagesParamsSchema = z.object({
 
 const getConversationParamsSchema = z.object({
     id: z.string(),
+});
+
+const exitGroupParamsSchema = z.object({
+    id: z.string(),
+});
+
+const removeParticipantsParamsSchema = z.object({
+    id: z.string(),
+});
+
+const removeParticipantsBodySchema = z.object({
+    participantIds: z.array(z.string()),
 });
 
 class ChatController {
@@ -142,6 +155,46 @@ class ChatController {
             res.status(StatusCodes.OK).json({
                 data: conversation,
             });
+        })
+    );
+
+    exit = withValidation(
+        {
+            paramsSchema: exitGroupParamsSchema,
+        },
+        asyncMiddleware(async (req, res, next) => {
+            const { id } = req.params as { id: string };
+            await chatService.removeParticipants(id, [req.account.id]);
+
+            res.status(StatusCodes.OK).json({
+                message: "Successfully exited group",
+            });
+        })
+    );
+
+    removeParticipants = withValidation(
+        {
+            paramsSchema: removeParticipantsParamsSchema,
+            bodySchema: removeParticipantsBodySchema,
+        },
+        asyncMiddleware(async (req, res, next) => {
+            const { id } = req.params as { id: string };
+            const isAdmin = await chatService.isAdmin(id, req.account.id);
+            if (isAdmin) {
+                await chatService.removeParticipants(
+                    id,
+                    req.body.participantIds
+                );
+
+                res.status(StatusCodes.OK).json({
+                    message: "Participants removed successfully",
+                });
+            } else {
+                throw new ErrorWithMessage(
+                    StatusCodes.FORBIDDEN,
+                    "Only admins can remove participants"
+                );
+            }
         })
     );
 }

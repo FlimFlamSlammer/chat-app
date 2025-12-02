@@ -16,6 +16,11 @@ export const createChatRouter = () => {
         "/:conversationId/send-message",
         chatController.sendMessage
     );
+    chatRouter.post("/:id/exit", chatController.exit);
+    chatRouter.put(
+        "/:id/remove-participants",
+        chatController.removeParticipants
+    );
     chatRouter.get("/:conversationId/messages", chatController.getMessages);
     chatRouter.get("/", chatController.getConversations);
     chatRouter.get("/:id", chatController.getById);

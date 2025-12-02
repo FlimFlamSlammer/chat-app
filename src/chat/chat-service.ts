@@ -112,17 +112,22 @@ class ChatService {
             );
         }
 
-        await Conversation.findByIdAndUpdate(groupId, {
+        await group.updateOne({
             $addToSet: { participants: { $each: inviteeIds } },
         });
 
-        inviteeIds.forEach(async (id) => {
-            await Account.findByIdAndUpdate(id, {
+        await Account.updateMany(
+            {
+                _id: {
+                    $in: inviteeIds,
+                },
+            },
+            {
                 $addToSet: {
                     conversations: groupId,
                 },
-            });
-        });
+            }
+        );
     }
 
     async sendMessage(conversationId: string, senderId: string, text: string) {
@@ -176,17 +181,77 @@ class ChatService {
         const conversation = await Conversation.findById(id)
             .populate({
                 path: "participants",
-                select: "username",
+                select: "username _id",
             })
             .populate({
                 path: "admins",
-                select: "username",
+                select: "username _id",
             })
             .exec();
         return conversation;
     }
 
-    async exit(id: string, userId: string) {}
+    async isAdmin(conversationId: string, participantId: string) {
+        const conversation = await Conversation.find({
+            _id: conversationId,
+            admins: {
+                $elemMatch: {
+                    _id: participantId,
+                },
+            },
+        });
+
+        if (conversation) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    async removeParticipants(conversationId: string, participantIds: string[]) {
+        const conversation = await Conversation.findById(conversationId);
+        if (!conversation) {
+            throw new ErrorWithMessage(
+                StatusCodes.NOT_FOUND,
+                "Conversation not found"
+            );
+        }
+        const participants = await Account.find()
+            .where("_id")
+            .in(participantIds.map((id) => new mongoose.Types.ObjectId(id)));
+
+        if (participants.length != participantIds.length) {
+            throw new ErrorWithMessage(
+                StatusCodes.NOT_FOUND,
+                "Participant(s) not found"
+            );
+        }
+
+        await conversation.updateOne({
+            $pull: {
+                participants: {
+                    _id: {
+                        $in: participantIds,
+                    },
+                },
+            },
+        });
+
+        await Account.updateMany(
+            {
+                _id: {
+                    $in: participantIds,
+                },
+            },
+            {
+                $pull: {
+                    conversations: {
+                        _id: conversationId,
+                    },
+                },
+            }
+        );
+    }
 }
 
 export const chatService = new ChatService();

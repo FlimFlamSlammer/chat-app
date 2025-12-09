@@ -43,6 +43,7 @@ class AuthController {
                 message: "Login successful",
                 data: {
                     authToken,
+                    account: req.account,
                 },
             });
         })

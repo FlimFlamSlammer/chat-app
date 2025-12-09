@@ -259,6 +259,15 @@ class ChatService {
             );
         }
 
+        participants.forEach((participant) => {
+            if (conversation.createdBy == participant.id) {
+                throw new ErrorWithMessage(
+                    StatusCodes.NOT_FOUND,
+                    "Cannot remove creator from group"
+                );
+            }
+        });
+
         await conversation.updateOne({
             $pull: {
                 participants: {

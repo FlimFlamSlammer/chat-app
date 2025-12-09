@@ -67,7 +67,7 @@ class AuthService {
 
         const authToken = this.signAuthToken({ id: account.id });
 
-        return authToken;
+        return { authToken, account };
     }
 
     async verifyAuthToken(rawAuthToken: string) {

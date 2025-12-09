@@ -37,13 +37,13 @@ class AuthController {
             bodySchema: logInSchema,
         },
         asyncMiddleware(async (req, res) => {
-            const authToken = await authService.logIn(req.body);
+            const { authToken, account } = await authService.logIn(req.body);
 
             return res.status(200).json({
                 message: "Login successful",
                 data: {
                     authToken,
-                    account: req.account,
+                    account,
                 },
             });
         })

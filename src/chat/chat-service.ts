@@ -191,6 +191,38 @@ class ChatService {
         return conversation;
     }
 
+    async addAdmins(conversationId: string, participantIds: string[]) {
+        const conversation = await Conversation.findById(conversationId);
+        if (!conversation) {
+            throw new ErrorWithMessage(
+                StatusCodes.NOT_FOUND,
+                "Conversation not found"
+            );
+        }
+        const participants = await Account.find()
+            .where("_id")
+            .in(participantIds.map((id) => new mongoose.Types.ObjectId(id)))
+            .where("conversations")
+            .elemMatch({ _id: conversationId });
+
+        if (participants.length != participantIds.length) {
+            throw new ErrorWithMessage(
+                StatusCodes.NOT_FOUND,
+                "Participant(s) not found"
+            );
+        }
+
+        await conversation.updateOne({
+            $addToSet: {
+                admins: {
+                    _id: {
+                        $in: participantIds,
+                    },
+                },
+            },
+        });
+    }
+
     async isAdmin(conversationId: string, participantId: string) {
         const conversation = await Conversation.find({
             _id: conversationId,
@@ -223,7 +255,7 @@ class ChatService {
         if (participants.length != participantIds.length) {
             throw new ErrorWithMessage(
                 StatusCodes.NOT_FOUND,
-                "Participant(s) not found"
+                "Participant account(s) not found"
             );
         }
 

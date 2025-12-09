@@ -32,19 +32,15 @@ const getMessagesParamsSchema = z.object({
     conversationId: z.string(),
 });
 
-const getConversationParamsSchema = z.object({
-    id: z.string(),
-});
-
-const exitGroupParamsSchema = z.object({
-    id: z.string(),
-});
-
-const removeParticipantsParamsSchema = z.object({
+const idParamsSchema = z.object({
     id: z.string(),
 });
 
 const removeParticipantsBodySchema = z.object({
+    participantIds: z.array(z.string()),
+});
+
+const addAdminsBodySchema = z.object({
     participantIds: z.array(z.string()),
 });
 
@@ -146,7 +142,7 @@ class ChatController {
 
     getById = withValidation(
         {
-            paramsSchema: getConversationParamsSchema,
+            paramsSchema: idParamsSchema,
         },
         asyncMiddleware(async (req, res, next) => {
             const { id } = req.params as { id: string };
@@ -160,7 +156,7 @@ class ChatController {
 
     exit = withValidation(
         {
-            paramsSchema: exitGroupParamsSchema,
+            paramsSchema: idParamsSchema,
         },
         asyncMiddleware(async (req, res, next) => {
             const { id } = req.params as { id: string };
@@ -174,7 +170,7 @@ class ChatController {
 
     removeParticipants = withValidation(
         {
-            paramsSchema: removeParticipantsParamsSchema,
+            paramsSchema: idParamsSchema,
             bodySchema: removeParticipantsBodySchema,
         },
         asyncMiddleware(async (req, res, next) => {
@@ -193,6 +189,29 @@ class ChatController {
                 throw new ErrorWithMessage(
                     StatusCodes.FORBIDDEN,
                     "Only admins can remove participants"
+                );
+            }
+        })
+    );
+
+    addAdmins = withValidation(
+        {
+            paramsSchema: idParamsSchema,
+            bodySchema: addAdminsBodySchema,
+        },
+        asyncMiddleware(async (req, res, next) => {
+            const { id } = req.params as { id: string };
+            const isAdmin = await chatService.isAdmin(id, req.account.id);
+            if (isAdmin) {
+                await chatService.addAdmins(id, req.body.participantIds);
+
+                res.status(StatusCodes.OK).json({
+                    message: "Admins added successfully",
+                });
+            } else {
+                throw new ErrorWithMessage(
+                    StatusCodes.FORBIDDEN,
+                    "Only admins can add new admins"
                 );
             }
         })

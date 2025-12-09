@@ -12,6 +12,7 @@ export const createChatRouter = () => {
     );
     chatRouter.post("/create-group", chatController.createGroup);
     chatRouter.put("/:groupId/invite", chatController.inviteToGroup);
+    chatRouter.put("/:id/add-admins", chatController.addAdmins);
     chatRouter.post(
         "/:conversationId/send-message",
         chatController.sendMessage

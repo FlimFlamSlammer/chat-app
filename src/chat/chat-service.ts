@@ -17,7 +17,7 @@ class ChatService {
         }
 
         const isFriend = creatorAccount.friends.reduce(
-            (acc, friendId) => (acc ||= friendId.toString() == targetId),
+            (acc, friendId) => (acc ||= friendId.toString() === targetId),
             false
         );
 
@@ -149,7 +149,15 @@ class ChatService {
     }
 
     async getConversations(accountId: string) {
-        const account = await Account.findById(accountId);
+        const account = await Account.findById(accountId).populate({
+            path: "conversations",
+            select: "name type participants",
+            populate: {
+                path: "participants",
+                select: "username",
+                perDocumentLimit: 2,
+            },
+        });
         if (!account) {
             throw new ErrorWithMessage(
                 StatusCodes.NOT_FOUND,
@@ -186,8 +194,7 @@ class ChatService {
             .populate({
                 path: "admins",
                 select: "username _id",
-            })
-            .exec();
+            });
         return conversation;
     }
 

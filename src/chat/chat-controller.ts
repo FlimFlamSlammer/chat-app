@@ -6,7 +6,7 @@ import { StatusCodes } from "http-status-codes";
 import { ErrorWithMessage } from "~/error";
 
 const createPersonalConversationBodySchema = z.object({
-    targetUserId: z.string(),
+    targetId: z.string(),
 });
 
 const createGroupBodySchema = z.object({

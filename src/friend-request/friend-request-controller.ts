@@ -7,7 +7,7 @@ import { FriendRequest } from "~/models/friend-request";
 import { accountService } from "~/account/account-service";
 
 const sendFriendRequestBodySchema = z.object({
-    username: z.string().trim(),
+    username: z.string().trim().min(1, "Required"),
 });
 
 const acceptFriendRequestParamsSchema = z.object({

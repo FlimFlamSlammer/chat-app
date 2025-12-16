@@ -67,7 +67,7 @@ class AuthService {
 
         const authToken = this.signAuthToken({ id: account.id });
 
-        return { authToken, account };
+        return { authToken, account: account.toObject() };
     }
 
     async verifyAuthToken(rawAuthToken: string) {
@@ -75,7 +75,7 @@ class AuthService {
         const [_, authToken] = rawAuthToken.split(" ");
 
         const { id } = jwt.verify(authToken, ENV.JWT_SECRET) as { id: string };
-        return (await Account.findById(id)) as AuthAccount;
+        return (await Account.findById(id))?.toObject() as AuthAccount;
     }
 
     private signAuthToken(payload: AuthTokenPayload) {

@@ -53,7 +53,11 @@ class ChatController {
         asyncMiddleware(async (req, res) => {
             const { conversationId } = req.params as { conversationId: string };
             const { text } = req.body;
-            await chatService.sendMessage(conversationId, req.account.id, text);
+            await chatService.sendMessage(
+                conversationId,
+                req.account._id,
+                text
+            );
 
             res.status(StatusCodes.OK).json({
                 message: "Message sent successfully",
@@ -68,7 +72,7 @@ class ChatController {
         asyncMiddleware(async (req, res) => {
             const { targetId } = req.body;
             await chatService.createPersonalConversation(
-                req.account.id,
+                req.account._id,
                 targetId
             );
 
@@ -84,7 +88,7 @@ class ChatController {
         },
         asyncMiddleware(async (req, res) => {
             const { name } = req.body;
-            await chatService.createGroup(req.account.id, name);
+            await chatService.createGroup(req.account._id, name);
 
             res.status(StatusCodes.OK).json({
                 message: "Group created successfully",
@@ -119,7 +123,7 @@ class ChatController {
         asyncMiddleware((req, res) => {
             const { conversationId } = req.params as { conversationId: string };
             const messages = chatService.getMessages(
-                req.account.id,
+                req.account._id,
                 conversationId
             );
 
@@ -133,7 +137,7 @@ class ChatController {
 
     getConversations = asyncMiddleware(async (req, res) => {
         const conversations = await chatService.getConversations(
-            req.account.id
+            req.account._id
         );
         res.status(StatusCodes.OK).json({
             data: conversations,
@@ -160,7 +164,7 @@ class ChatController {
         },
         asyncMiddleware(async (req, res, next) => {
             const { id } = req.params as { id: string };
-            await chatService.removeParticipants(id, [req.account.id]);
+            await chatService.removeParticipants(id, [req.account._id]);
 
             res.status(StatusCodes.OK).json({
                 message: "Successfully exited group",
@@ -175,7 +179,7 @@ class ChatController {
         },
         asyncMiddleware(async (req, res, next) => {
             const { id } = req.params as { id: string };
-            const isAdmin = await chatService.isAdmin(id, req.account.id);
+            const isAdmin = await chatService.isAdmin(id, req.account._id);
             if (isAdmin) {
                 await chatService.removeParticipants(
                     id,
@@ -201,7 +205,7 @@ class ChatController {
         },
         asyncMiddleware(async (req, res, next) => {
             const { id } = req.params as { id: string };
-            const isAdmin = await chatService.isAdmin(id, req.account.id);
+            const isAdmin = await chatService.isAdmin(id, req.account._id);
             if (isAdmin) {
                 await chatService.addAdmins(id, req.body.participantIds);
 

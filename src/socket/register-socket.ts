@@ -8,10 +8,10 @@ export const registerSocket = (io: Server) => {
             const token = socket.handshake.headers.authorization as string;
 
             const account = await authService.verifyAuthToken(token);
-            socket.data.accountId = account.id;
-            socket.join(`personal:${account.id}`);
+            socket.data.accountId = account._id;
+            socket.join(`personal:${account._id}`);
             console.log(
-                `Socket connected: ${socket.id} from account ${account.id}`
+                `Socket connected: ${socket.id} from account ${account._id}`
             );
 
             registerFriendRequestHandlers(io, socket);

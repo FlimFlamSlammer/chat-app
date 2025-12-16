@@ -8,15 +8,15 @@ import { StatusCodes } from "http-status-codes";
 import { ENV } from "~/env";
 
 const registerSchema = z.object({
-    name: z.string().trim(),
-    username: z.string().trim(),
-    email: z.string().trim(),
-    password: z.string(),
+    name: z.string().trim().min(1, "Required"),
+    username: z.string().trim().min(1, "Required"),
+    email: z.string().trim().min(1, "Required"),
+    password: z.string().min(1, "Required"),
 });
 
 const logInSchema = z.object({
-    email: z.string().trim(),
-    password: z.string(),
+    email: z.string().trim().min(1, "Required"),
+    password: z.string().min(1, "Required"),
 });
 
 class AuthController {
@@ -53,9 +53,7 @@ class AuthController {
     getLoggedInAccount = asyncMiddleware(async (req, res) => {
         return res.status(StatusCodes.OK).json({
             message: "Account details",
-            data: {
-                account: req.account,
-            },
+            data: { ...req.account, password: undefined },
         });
     });
 

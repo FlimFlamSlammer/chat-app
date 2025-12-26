@@ -58,17 +58,18 @@ class AuthController {
     });
 
     middleware = asyncMiddleware(async (req, res, next) => {
-        const authToken = req.headers.authorization;
+        const bearerToken = req.headers.authorization;
         const unauthorizedResponse = () => {
             return res.status(StatusCodes.UNAUTHORIZED).json({
                 message: "Unauthorized",
             });
         };
-        if (!authToken) {
+        if (!bearerToken) {
             return unauthorizedResponse();
         }
 
         try {
+            const [_, authToken] = bearerToken.split(" ");
             const account = await authService.verifyAuthToken(authToken);
             req.account = account;
             next();

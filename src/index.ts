@@ -27,7 +27,12 @@ async function startServer() {
     });
 
     const ioServer = createServer();
-    const io = new Server(ioServer);
+    const io = new Server(ioServer, {
+        cors: {
+            credentials: true,
+            origin: "http://localhost:3000",
+        },
+    });
     registerSocket(io);
 
     ioServer.listen(ENV.SOCKET_PORT, () => {

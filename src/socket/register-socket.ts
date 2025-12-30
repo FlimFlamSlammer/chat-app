@@ -6,9 +6,9 @@ import * as cookie from "cookie";
 export const registerSocket = (io: Server) => {
     io.on("connection", async (socket: Socket) => {
         try {
+            console.log(socket.handshake.headers.cookie);
             const cookies = cookie.parse(socket.handshake.headers.cookie || "");
-            console.log(cookies);
-            const token = cookies.AUTH_TOKEN;
+            const token = cookies.authToken;
 
             if (!token) {
                 throw new Error("Fail to authenticate!");

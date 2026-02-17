@@ -2,6 +2,7 @@ import { Server, Socket } from "socket.io";
 import { authService } from "~/auth/auth-service";
 import { registerFriendRequestHandlers } from "./friend-request";
 import * as cookie from "cookie";
+import { registerChatHandlers } from "./chat";
 
 export const registerSocket = (io: Server) => {
     io.on("connection", async (socket: Socket) => {
@@ -22,6 +23,7 @@ export const registerSocket = (io: Server) => {
             );
 
             registerFriendRequestHandlers(io, socket);
+            registerChatHandlers(io, socket);
         } catch (error) {
             console.error(error);
             socket.disconnect();

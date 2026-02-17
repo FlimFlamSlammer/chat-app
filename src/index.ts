@@ -8,6 +8,7 @@ import { registerSocket } from "./socket/register-socket";
 import { createServer } from "http";
 import { createFriendRequestRouter } from "./friend-request/friend-request-router";
 import { createChatRouter } from "./chat/chat-router";
+import { createFriendRouter } from "./friend/friend-router";
 
 async function startServer() {
     const app = express();
@@ -19,6 +20,7 @@ async function startServer() {
     app.use("/auth", createAuthRouter());
     app.use("/friend-request", createFriendRequestRouter());
     app.use("/conversation", createChatRouter());
+    app.use("/friend", createFriendRouter());
 
     app.use(errorMiddleware);
 

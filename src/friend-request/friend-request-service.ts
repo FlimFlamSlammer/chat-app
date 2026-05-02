@@ -37,7 +37,7 @@ class FriendRequestService {
 
     async accept(id: string, receiverId: string) {
         const request = await FriendRequest.findById(id);
-        if (!request || request.to.toString() !== receiverId) {
+        if (!request || request.to.toString() != receiverId) {
             throw new ErrorWithMessage(
                 StatusCodes.NOT_FOUND,
                 "Friend request not found"

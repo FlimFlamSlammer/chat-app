@@ -67,6 +67,9 @@ class FriendRequestController {
     getIncoming = asyncMiddleware(async (req, res) => {
         const friendRequests = await FriendRequest.find({
             to: req.account._id,
+        }).populate({
+            path: "from",
+            select: "username",
         });
         res.status(StatusCodes.OK).json({
             data: friendRequests,
@@ -76,6 +79,9 @@ class FriendRequestController {
     getOutgoing = asyncMiddleware(async (req, res) => {
         const friendRequests = await FriendRequest.find({
             from: req.account._id,
+        }).populate({
+            path: "to",
+            select: "username",
         });
         res.status(StatusCodes.OK).json({
             data: friendRequests,

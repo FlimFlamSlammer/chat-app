@@ -154,7 +154,7 @@ class ChatService {
             select: "name type participants",
             populate: {
                 path: "participants",
-                select: "username",
+                select: "username name",
                 perDocumentLimit: 2,
             },
         });
@@ -189,11 +189,11 @@ class ChatService {
         const conversation = await Conversation.findById(id)
             .populate({
                 path: "participants",
-                select: "username _id",
+                select: "username name _id",
             })
             .populate({
                 path: "admins",
-                select: "username _id",
+                select: "username name _id",
             });
         return conversation;
     }

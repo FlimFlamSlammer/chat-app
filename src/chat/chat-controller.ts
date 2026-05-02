@@ -16,6 +16,7 @@ const createGroupBodySchema = z.object({
 const inviteToGroupBodySchema = z.object({
     inviteeIds: z.array(z.string()),
 });
+
 const inviteToGroupParamsSchema = z.object({
     groupId: z.string(),
 });

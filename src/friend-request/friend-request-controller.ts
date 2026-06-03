@@ -5,6 +5,7 @@ import { friendRequestService } from "./friend-request-service";
 import { StatusCodes } from "http-status-codes";
 import { FriendRequest } from "~/models/friend-request";
 import { accountService } from "~/account/account-service";
+import { FieldError } from "~/error";
 
 const sendFriendRequestBodySchema = z.object({
     username: z.string().trim().min(1, "Required"),
@@ -21,16 +22,25 @@ class FriendRequestController {
         },
         asyncMiddleware(async (req, res) => {
             const { username } = req.body;
-            const account = await accountService.findByUsername(username);
 
-            await friendRequestService.send({
-                from: req.account._id,
-                to: account?.id,
-            });
+            try {
+                const account = await accountService.findByUsername(username);
 
-            res.status(StatusCodes.OK).json({
-                message: "Friend request sent successfully",
-            });
+                await friendRequestService.send({
+                    from: req.account._id,
+                    to: account?.id,
+                });
+
+                res.status(StatusCodes.OK).json({
+                    message: "Friend request sent successfully",
+                });
+            } catch (error) {
+                throw new FieldError({
+                    username:
+                        (error as Error).message ||
+                        "Unknown error has occurred",
+                });
+            }
         })
     );
 

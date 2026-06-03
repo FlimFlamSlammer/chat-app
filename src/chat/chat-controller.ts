@@ -10,7 +10,7 @@ const createPersonalConversationBodySchema = z.object({
 });
 
 const createGroupBodySchema = z.object({
-    name: z.string().trim(),
+    name: z.string().trim().min(1, "Required"),
 });
 
 const inviteToGroupBodySchema = z.object({
@@ -26,7 +26,7 @@ const sendMessageParamsSchema = z.object({
 });
 
 const sendMessageBodySchema = z.object({
-    text: z.string().min(1),
+    text: z.string().min(1, "Required"),
 });
 
 const getMessagesParamsSchema = z.object({
@@ -72,13 +72,14 @@ class ChatController {
         },
         asyncMiddleware(async (req, res) => {
             const { targetId } = req.body;
-            await chatService.createPersonalConversation(
+            const conversation = await chatService.createPersonalConversation(
                 req.account._id,
                 targetId
             );
 
             res.status(StatusCodes.OK).json({
                 message: "Conversation created successfully",
+                data: conversation,
             });
         })
     );
@@ -89,10 +90,11 @@ class ChatController {
         },
         asyncMiddleware(async (req, res) => {
             const { name } = req.body;
-            await chatService.createGroup(req.account._id, name);
+            const group = await chatService.createGroup(req.account._id, name);
 
             res.status(StatusCodes.OK).json({
                 message: "Group created successfully",
+                data: group,
             });
         })
     );

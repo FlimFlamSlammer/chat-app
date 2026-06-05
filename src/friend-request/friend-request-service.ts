@@ -11,7 +11,7 @@ export interface SendFriendRequestDTO {
 
 class FriendRequestService {
     async send(data: SendFriendRequestDTO) {
-        if (data.from == data.to) {
+        if (data.from === data.to) {
             throw new ErrorWithMessage(
                 StatusCodes.BAD_REQUEST,
                 "Cannot send friend request to yourself"

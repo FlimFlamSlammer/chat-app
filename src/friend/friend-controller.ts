@@ -10,7 +10,7 @@ const removeFriendBodySchema = z.object({
 
 class FriendController {
     getAll = asyncMiddleware(async (req, res, next) => {
-        const friends = await friendService.getAll(req.account._id);
+        const friends = await friendService.getAll(req.account._id.toString());
         res.status(StatusCodes.OK).json({
             data: friends,
         });
@@ -21,7 +21,10 @@ class FriendController {
             bodySchema: removeFriendBodySchema,
         },
         asyncMiddleware(async (req, res, next) => {
-            await friendService.remove(req.account._id, req.body.friendId);
+            await friendService.remove(
+                req.account._id.toString(),
+                req.body.friendId
+            );
             res.status(StatusCodes.OK).json({
                 message: "Friend successfully removed",
             });

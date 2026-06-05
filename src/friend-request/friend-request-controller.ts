@@ -27,8 +27,8 @@ class FriendRequestController {
                 const account = await accountService.findByUsername(username);
 
                 await friendRequestService.send({
-                    from: req.account._id,
-                    to: account?.id,
+                    from: req.account._id.toString(),
+                    to: account?.id.toString(),
                 });
 
                 res.status(StatusCodes.OK).json({
@@ -51,7 +51,7 @@ class FriendRequestController {
         asyncMiddleware(async (req, res) => {
             const id = req.params.id as string;
 
-            await friendRequestService.accept(id, req.account._id);
+            await friendRequestService.accept(id, req.account._id.toString());
 
             res.status(StatusCodes.OK).json({
                 message: "Friend request accepted successfully",
@@ -66,7 +66,7 @@ class FriendRequestController {
         asyncMiddleware(async (req, res) => {
             const id = req.params.id as string;
 
-            await friendRequestService.reject(id, req.account._id);
+            await friendRequestService.reject(id, req.account._id.toString());
 
             res.status(StatusCodes.OK).json({
                 message: "Friend request rejected successfully",

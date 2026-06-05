@@ -3,6 +3,7 @@ import argon2 from "argon2";
 import { FieldError } from "~/error";
 import jwt from "jsonwebtoken";
 import { ENV } from "~/env";
+import mongoose from "mongoose";
 
 export interface CreateAccountDTO {
     name: string;
@@ -17,7 +18,7 @@ export interface LogInDTO {
 }
 
 export interface AuthAccount {
-    _id: string;
+    _id: mongoose.Types.ObjectId[];
     name: string;
     username: string;
     email: string;
